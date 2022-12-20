@@ -18,6 +18,8 @@ os.mkdir(outputs)
 os.mkdir(outputs_netvlad)
 os.mkdir(outputs_loftr_aachen)
 
+print(os.path.abspath(outputs))
+
 # Пары изображений (файл .txt)
 sfm_pairs = outputs_netvlad / 'pairs-sfm.txt'
 

@@ -13,6 +13,7 @@ images = Path('datasets/South Building/')
 outputs = Path('outputs/')
 outputs_loftr = outputs / 'LoFTR'
 outputs_netvlad = outputs / 'netVLAD'
+print(os.path.abspath(outputs))
 
 os.mkdir(outputs)
 os.mkdir(outputs_loftr)
