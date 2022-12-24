@@ -1,58 +1,55 @@
-# Необходимые модули
 from pathlib import Path
 import os
 from hloc import extract_features, match_features, match_dense, reconstruction, visualization, pairs_from_retrieval
 from hloc.visualization import plot_images, read_image
 from hloc.utils import viz_3d
 
-# Снимки храма
 images = Path('datasets/South Building/')
 
 
-# Вывод
 outputs = Path('outputs/')
 outputs_loftr = outputs / 'LoFTR'
 outputs_netvlad = outputs / 'netVLAD'
 print(os.path.abspath(outputs))
 
-os.mkdir(outputs)
-os.mkdir(outputs_loftr)
-os.mkdir(outputs_netvlad)
+for fold in (outputs, outputs_loftr, outputs_netvlad):
+    try:
+        os.mkdir(fold)
+    except:
+        pass
 
-# Пары изображений (файл .txt)
+# Pairs
 sfm_pairs = outputs_netvlad / 'pairs-sfm.txt'
 
-# Structure from Motion вывод
+# Structure from Motion
 sfm_dir_loftr = outputs_loftr / 'sfm'
 
 
-# Признаки
+# Features
 features_loftr = outputs_loftr / 'features.h5'
 
-# Мэчи
+# Matches
 matches_loftr = outputs_loftr / 'matches.h5'
 
 # Retrieval
 retrieval_conf = extract_features.confs['netvlad']
 
-# Параметры моделей 
+# Configs
 # LoFTR:
 LoFTR_conf = match_dense.confs['loftr']
 
 
-
-# Изображения (10)
+# Images
 references = [p.relative_to(images).as_posix() for p in (images).iterdir()]
 
-# Вывод
-print(len(references), "mapping images")
+print(f"Mapping images{len(references)}")
 
 
 retrieval_path = extract_features.main(retrieval_conf, images, outputs_netvlad)
 pairs_from_retrieval.main(retrieval_path, sfm_pairs, num_matched=5)
 
 
-# Извлекаем признаки из изображений в папке images. Результат в "features.h5".
+# Featuring and matching
 features, matches = match_dense.main(LoFTR_conf, sfm_pairs, images, matches=matches_loftr, features=features_loftr)
 
 model = reconstruction.main(sfm_dir_loftr, images, sfm_pairs, features, matches, image_list=references)
