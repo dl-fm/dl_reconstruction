@@ -1,5 +1,4 @@
 FROM colmap/colmap:latest
-MAINTAINER Paul-Edouard Sarlin
 ARG PYTHON_VERSION=3.8
 RUN apt-key del 7fa2af80
 RUN apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/3bf863cc.pub
@@ -13,5 +12,5 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTH
 COPY . /app
 WORKDIR app/
 RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
+RUN pip3 install numpy scipy h5py
 RUN pip3 install notebook

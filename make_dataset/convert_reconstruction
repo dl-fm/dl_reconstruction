@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Create dataset similar to "MegaDepth" with your own
+# COLMAP sparse reconstruction and set of images.
+
+
+# SETUP
+PATH_TO_RECONSTRUCTION=$1
+OUTPUT_DIR=$2
+
+
+# DEALING WITH OUTPUT
+rm -rf {$OUTPUT_DIR,$PATH_TO_RECONSTRUCTION/dense}
+mkdir $OUTPUT_DIR $PATH_TO_RECONSTRUCTION/dense
+
+
+# Multi-View Stereo
+
+colmap image_undistorter --image_path $PATH_TO_RECONSTRUCTION/images --input_path $PATH_TO_RECONSTRUCTION/sparse --output_path $PATH_TO_RECONSTRUCTION/dense
+
+colmap patch_match_stereo --workspace_path $PATH_TO_RECONSTRUCTION/dense --workspace_format COLMAP --PatchMatchStereo.geom_consistency true
+
+# colmap stereo_fusion --workspace_path $PATH_TO_RECONSTRUCTION/dense --output_path $PATH_TO_RECONTRUCTION/dense/fused.ply
+
+
+# DATASET PREPROCESS
+
+python3 scripts/bin_to_hfive.py $PATH_TO_OUTPUT/dense/stereo/depth_maps $OUTPUT_DIR
