@@ -4,6 +4,10 @@ import json
 import re
 import os
 import shutil
+<<<<<<< HEAD
+=======
+import argparse
+>>>>>>> 3-add-filter-code
 
 import numpy as np
 
@@ -136,4 +140,41 @@ def main(
             sparse_dir=sparse_dir,
         )
 
+<<<<<<< HEAD
     return {"camera_filter": camera_filter, "filtered": filtered}
+=======
+    return {"camera_filter": camera_filter, "filtered": filtered}
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Filter reconstruction")
+
+    parser.add_argument("input_dir", type=str, default="./")
+    parser.add_argument("output_dir", type=str, default="./")
+    parser.add_argument("path_to_images_dir", type=str, default=None)
+
+    args = parser.parse_args()
+    inp_dir, out_dir, path_to_images_dir = (
+        args.input_dir,
+        args.output_dir,
+        args.path_to_images_dir,
+    )
+
+    result = main(images_path=inp_dir, output_dir=out_dir)
+
+    path_to_images_dir = Path(path_to_images_dir)
+
+    pattern = re.compile("[_]?([0-9]+).jpg", re.IGNORECASE)
+
+    # Deleting images that are not in filtered file
+    if path_to_images_dir is not None:
+        for image in os.listdir(path_to_images_dir):
+            ans = re.search(pattern, image)
+            if ans:
+                if (ans[1] in result["filtered"]) or (
+                    ans[1] not in result["camera_filter"].reconst.images
+                ):
+                    print(path_to_images_dir / image)
+                    os.remove(path_to_images_dir / image)
+>>>>>>> 3-add-filter-code

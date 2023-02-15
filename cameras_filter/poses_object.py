@@ -17,9 +17,15 @@ class Poses:
     file ('images.bin' or 'description.json').
     """
 
+<<<<<<< HEAD
 
     pattern = re.compile("_([0-9]+).jpg")  # Extract id of every image from its name
 
+=======
+    pattern = re.compile(
+        "[_]?([0-9]+).jpg", re.IGNORECASE
+    )  # Extract id of every image from its name
+>>>>>>> 3-add-filter-code
 
     def __init__(self, file_with_poses: PathLikeObject, **kwargs) -> dict:
         """Construct poses object.
@@ -48,6 +54,7 @@ class Poses:
             f"""Camera poses object was created. \nNumber of images: {self.num_of_objects}.\n"""
         )
 
+<<<<<<< HEAD
 
     def __setattr__(self, name, value):
         """Change instances' attributes with camera_poses."""
@@ -58,13 +65,27 @@ class Poses:
         else:
             self.__dict__[name] = value
 
+=======
+    @property
+    def camera_poses(self):
+        return self._camera_poses
+
+    @camera_poses.setter
+    def camera_poses(self, value):
+        self._camera_poses = value
+        self.images = tuple(self.camera_poses)
+        self.object_num = len(self.images)
+>>>>>>> 3-add-filter-code
 
     def extract_poses(self, file: PathLikeObject) -> dict:
         """Extract poses from file."""
         # Python virtual method
         raise NotImplementedError()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def find_nearest(self, image: Tuple) -> Tuple[str, str]:
         """Auxiliary function for neighbour searching.
 
@@ -93,7 +114,10 @@ class Poses:
 
         return (first, second)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def find_neighbours(self, manual: bool = False):
         """Find two closest poses for every image.
 
@@ -129,7 +153,10 @@ class Poses:
             for image in self.camera_poses.items():
                 self.neighbours[image[0]] = tuple(self.find_nearest(image))
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     @staticmethod
     def distance(point1: dict, point2: dict):
         point1 = np.array(list(point1.values()))

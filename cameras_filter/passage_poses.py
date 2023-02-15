@@ -19,7 +19,10 @@ class Passage(Poses):
     linear_or_circular = {"circular": 0, "linear": 1, "calibration": 2}
     manual_or_auto = {"auto": 0, "manual": 1}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def extract_poses(
         self,
         path_to_description: PathLikeObject,
@@ -69,7 +72,10 @@ class Passage(Poses):
 
         return result
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def select_passage(self, path_to_description: PathLikeObject) -> int:
         """Output the list of passages and ask user to make choice."""
 
@@ -95,8 +101,16 @@ class Passage(Poses):
         return int(users_choice)
 
     def find_neighbours(self):
+<<<<<<< HEAD
         """If the passage doesn't contain any geometric 
         information, two closest images in image the list
         will be the neighbours.
         """
         Poses.find_neighbours(self, manual=self.is_manual)
+=======
+        """If the passage doesn't contain any geometric
+        information, two closest images in image the list
+        will be the neighbours.
+        """
+        Poses.find_neighbours(self, manual=self.is_manual)
+>>>>>>> 3-add-filter-code

@@ -113,4 +113,8 @@ class Reconstruction(Poses):
             key: value
             for key, value in self.camera_poses.items()
             if key in passage.images
+<<<<<<< HEAD
         }
+=======
+        }
+>>>>>>> 3-add-filter-code

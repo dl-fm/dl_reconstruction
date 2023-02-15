@@ -49,8 +49,11 @@ def visualize_cameras(
         plot_camera_colmap(fig, pose, camera, color=color, name="Wrong camera!!!")
 
     return fig
+<<<<<<< HEAD
 
 
 if __name__ == "__main__":
 
     pass
+=======
+>>>>>>> 3-add-filter-code

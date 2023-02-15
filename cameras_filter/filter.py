@@ -37,7 +37,10 @@ class CameraFilter:
             self.with_passage = False
         self.reconst = reconstruction
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def calculate_true_distances(self):
         """Get the distances to the true
         neighbours from the passage information
@@ -88,12 +91,18 @@ class CameraFilter:
                 neighbour_2: distance_2,
             }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def is_anomaly(self, distances: dict, interval: Tuple[float, float] = 0.95):
         dist = np.mean(np.array(list(distances.values())))
         return not interval[0] < dist < interval[1]
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3-add-filter-code
     def filter(self, softness: float = 0.95) -> set:
         """Cameras filtering algorithm.
 

@@ -41,10 +41,17 @@ def select_images(
             Deleting if it is true, extracting if it's false.
 
         output_file: Optional[PathLikeObject] = None
+<<<<<<< HEAD
             Path to the output file. If user sets it 
             with the path to the source file, the 
             file will be rewritten. If it's None, 
             file will get the default name 
+=======
+            Path to the output file. If user sets it
+            with the path to the source file, the
+            file will be rewritten. If it's None,
+            file will get the default name
+>>>>>>> 3-add-filter-code
             'images_subset.*' with the extension of
             the source images file.
     """
@@ -131,7 +138,11 @@ def main(
             Path to the output file.
 
         selected_passage: Optional[int] = None
+<<<<<<< HEAD
             The id of the selected passage 
+=======
+            The id of the selected passage
+>>>>>>> 3-add-filter-code
             in the list of the passages. If
             it's None, function runs in the
             'select_in_process' mode.
@@ -140,8 +151,12 @@ def main(
         information.
     """
 
+<<<<<<< HEAD
     if selected_passage is None:
         select_in_process = True
+=======
+    select_in_process = True if selected_passage is None else False
+>>>>>>> 3-add-filter-code
 
     passage = Passage(
         description_file,
@@ -164,3 +179,27 @@ def main(
     )
 
     return output_file, passage.passage_id
+<<<<<<< HEAD
+=======
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Extract passage")
+
+    parser.add_argument("images_path", type=str, default="./")
+    parser.add_argument("description_file", type=str, default="./")
+    parser.add_argument("selected_passage", type=str, default="./")
+
+    args = parser.parse_args()
+    reconst_images_path, description_file, selected_passage = (
+        args.images_path,
+        args.description_file,
+        args.selected_passage,
+    )
+
+    main(
+        reconst_images_path=reconst_images_path,
+        description_file=description_file,
+        selected_passage=selected_passage,
+    )
+>>>>>>> 3-add-filter-code

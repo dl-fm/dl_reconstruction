@@ -1,3 +1,8 @@
 *.yml
 .ipynb_checkpoints
 *.pyc
+<<<<<<< HEAD
+=======
+data
+core
+>>>>>>> 3-add-filter-code
