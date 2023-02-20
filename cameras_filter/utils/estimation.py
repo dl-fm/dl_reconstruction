@@ -15,6 +15,7 @@ import os
 
 from sample_generation import add_noise
 from main import main as run_filter
+from data_manipulations import main as extract
 
 PathLikeObject = Union[str, Path]
 
@@ -51,50 +52,90 @@ def score_points(cam_filter: dict, noised: set) -> Tuple:
 
 def main(
     images_path: PathLikeObject,
-    description_file: Optional[PathLikeObject] = None,
-    selected_passage: Optional[int] = None,
+    description_file: PathLikeObject,
+    with_passage: bool = False,
     algorithm_softness: float = 0.85,
     number_of_tests: int = 5,
-    number_of_passages: int = 10,
-    noised_data_proportion=0.15,
-    noise_scale=1,
+    number_of_passages: Optional[int] = 1,
+    noised_data_proportion: float = 0.15,
+    noise_scale: float = 1,
+    uniform: bool = True,
 ):
+    """Evaluate the algorithm using 3 popular ML quality metrics.
+
+    Parameters
+        --------------
+        images_path : PathLikeObject
+            Path to the file with image information
+            of '.txt' or '.bin' extension.
+        description_file: PathLikeObject
+            Path to the description file of
+            '.json' extension.
+        with_passage: bool = False
+            If it's true, tests every passage
+            from description file.
+        algorithm_softness : float = 0.85
+            A real parameter with value between 0 and 1,
+            which determines approximately how many images
+            won't be deleted by the algorithm.
+        number_of_tests: int = 5
+            Every passage will be sampled, filtered and
+            evaluated $number_of_tests times.
+        number_of_passages: Optional[int] = 1
+            How many passages does the description file
+            contain. This parameter matters only if
+            with_passage = True.
+        noised_data_proportion: float = 0.15
+            The fraction of data that will be
+            noised.
+        noise_scale: float = 1
+            The noise variable will be scaled with
+            the noise_scale parameter.
+        uniform: bool = True
+            Determines the type of noise. If it's
+            True, the noise variable will have
+            uniform distribution, else - normal.
+    """
 
     prec = []
     rec = []
     f_1 = []
 
-    if selected_passage is None:
-        select_in_process = True
-    else:
-        select_in_process = False
-
-    images_subset = Path(
-        str(Path(images_path).parent / Path(images_path).stem) + "_sampled.bin"
-    )
+    passages = range(number_of_passages) if number_of_passages else [None]
 
     for i in range(number_of_tests):
         for passage_id in range(number_of_passages):
 
+            images_subset = Path(
+                str(Path(images_path).parent / Path(images_path).stem) + "_sampled.bin"
+            )
+
+            extract(
+                reconst_images_path=images_path,
+                description_file=description_file,
+                output_file=images_subset,
+                selected_passage=passage_id,
+            )
+
             noised, images_subset = add_noise(
-                path_to_images=images_path,
+                path_to_images=images_subset,
                 path_to_output=images_subset,
                 probability=noised_data_proportion,
                 noise_scale=noise_scale,
+                uniform=uniform,
             )
 
             filtering_result = run_filter(
                 images_path=images_subset,
+                description_file=description_file if with_passage else None,
                 softness=algorithm_softness,
-                description_file=description_file,
-                selected_passage=selected_passage,
-                select_in_process=select_in_process,
+                selected_passage=passage_id,
             )["camera_filter"]
 
             result = score_points(filtering_result.cameras_filter, noised)
 
-            prec.append(result[0])
-            rec.append(result[1])
+            rec.append(result[0])
+            prec.append(result[1])
             f_1.append(result[2])
 
             os.remove(images_subset)

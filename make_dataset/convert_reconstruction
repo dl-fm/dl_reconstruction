@@ -2,22 +2,50 @@
 
 # Create dataset similar to "MegaDepth" with your own
 # COLMAP sparse reconstruction and set of images.
+# Use filter if it's necessary.
 
 
 # SETUP
 PATH_TO_RECONSTRUCTION=$1
 OUTPUT_DIR=$2
 
+# Filtering
+if [ "$3"=="--with_filter" ]
+then
+if [[ "$4" != "" && "$5" != "" ]]
+then
+echo "Running filter with selected passage..."
+PATH_TO_DESCRIPTION=$4
+SELECTED_PASSAGE=$5
+python3 ./cameras_filter/data_manipulations.py $PATH_TO_RECONSTRUCTION/sparse/images.bin $PATH_TO_DESCRIPTION $SELECTED_PASSAGE
+python3 ./cameras_filter/main.py $PATH_TO_RECONSTRUCTION/sparse/images_subset.bin $PATH_TO_RECONSTRUCTION/filtered $PATH_TO_RECONSTRUCTION/images
+rm -f $PATH_TO_RECONSTRUCTION/sparse/images_subset.bin
+cp -r $PATH_TO_RECONSTRUCTION/images $PATH_TO_RECONSTRUCTION/filtered/right_positions/
+PATH_TO_RECONSTRUCTION=$PATH_TO_RECONSTRUCTION/filtered/right_positions
+mkdir $PATH_TO_RECONSTRUCTION/sparse
+cp $PATH_TO_RECONSTRUCTION/{images.bin,cameras.bin,points3D.bin} $PATH_TO_RECONSTRUCTION/sparse
+else
+echo "Running filter without passage information..."
+python3 ./cameras_filter/main.py $PATH_TO_RECONSTRUCTION/sparse/images.bin $PATH_TO_RECONSTRUCTION/filtered $PATH_TO_RECONSTRUCTION/images
+cp -r $PATH_TO_RECONSTRUCTION/images $PATH_TO_RECONSTRUCTION/filtered/right_positions/
+PATH_TO_RECONSTRUCTION=$PATH_TO_RECONSTRUCTION/filtered/right_positions
+mkdir $PATH_TO_RECONSTRUCTION/sparse
+mv $PATH_TO_RECONSTRUCTION/{images.bin,cameras.bin,points3D.bin} $PATH_TO_RECONSTRUCTION/sparse
+fi
+python3 ./cameras_filter/delete_points.py $PATH_TO_RECONSTRUCTION/sparse/images.bin $PATH_TO_RECONSTRUCTION/sparse/points3D.bin
+fi
+
 
 # DEALING WITH OUTPUT
 rm -rf {$OUTPUT_DIR,$PATH_TO_RECONSTRUCTION/dense}
 mkdir $OUTPUT_DIR $PATH_TO_RECONSTRUCTION/dense
-
+# cp -r $PATH_TO_RECONSTRUCTION/images $PATH_TO_RECONSTRUCTION/dense
 
 # Multi-View Stereo
+echo "Undistorting images..."
+colmap image_undistorter --image_path $PATH_TO_RECONSTRUCTION/images --input_path $PATH_TO_RECONSTRUCTION/sparse --output_path $PATH_TO_RECONSTRUCTION/dense --output_type COLMAP
 
-colmap image_undistorter --image_path $PATH_TO_RECONSTRUCTION/images --input_path $PATH_TO_RECONSTRUCTION/sparse --output_path $PATH_TO_RECONSTRUCTION/dense
-
+echo "Patching images..."
 colmap patch_match_stereo --workspace_path $PATH_TO_RECONSTRUCTION/dense --workspace_format COLMAP --PatchMatchStereo.geom_consistency true
 
 # colmap stereo_fusion --workspace_path $PATH_TO_RECONSTRUCTION/dense --output_path $PATH_TO_RECONTRUCTION/dense/fused.ply
@@ -25,4 +53,5 @@ colmap patch_match_stereo --workspace_path $PATH_TO_RECONSTRUCTION/dense --works
 
 # DATASET PREPROCESS
 
-python3 scripts/bin_to_hfive.py $PATH_TO_OUTPUT/dense/stereo/depth_maps $OUTPUT_DIR
+echo "Forming the dataset"
+python3 ./make_dataset/scripts/bin_to_hfive.py $PATH_TO_RECONSTRUCTION/dense/stereo/depth_maps $OUTPUT_DIR
