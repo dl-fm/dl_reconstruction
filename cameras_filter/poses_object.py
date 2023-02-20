@@ -17,9 +17,9 @@ class Poses:
     file ('images.bin' or 'description.json').
     """
 
-
-    pattern = re.compile("_([0-9]+).jpg")  # Extract id of every image from its name
-
+    pattern = re.compile(
+        "[_]?([0-9]+).jpg", re.IGNORECASE
+    )  # Extract id of every image from its name
 
     def __init__(self, file_with_poses: PathLikeObject, **kwargs) -> dict:
         """Construct poses object.
@@ -48,22 +48,20 @@ class Poses:
             f"""Camera poses object was created. \nNumber of images: {self.num_of_objects}.\n"""
         )
 
+    @property
+    def camera_poses(self):
+        return self._camera_poses
 
-    def __setattr__(self, name, value):
-        """Change instances' attributes with camera_poses."""
-        if name == "camera_poses":
-            self.__dict__[name] = value
-            self.images = tuple(self.camera_poses)
-            self.object_num = len(self.images)
-        else:
-            self.__dict__[name] = value
-
+    @camera_poses.setter
+    def camera_poses(self, value):
+        self._camera_poses = value
+        self.images = tuple(self.camera_poses)
+        self.object_num = len(self.images)
 
     def extract_poses(self, file: PathLikeObject) -> dict:
         """Extract poses from file."""
         # Python virtual method
         raise NotImplementedError()
-
 
     def find_nearest(self, image: Tuple) -> Tuple[str, str]:
         """Auxiliary function for neighbour searching.
@@ -92,7 +90,6 @@ class Poses:
                 second = item[0]
 
         return (first, second)
-
 
     def find_neighbours(self, manual: bool = False):
         """Find two closest poses for every image.
@@ -128,7 +125,6 @@ class Poses:
         else:
             for image in self.camera_poses.items():
                 self.neighbours[image[0]] = tuple(self.find_nearest(image))
-
 
     @staticmethod
     def distance(point1: dict, point2: dict):

@@ -49,8 +49,3 @@ def visualize_cameras(
         plot_camera_colmap(fig, pose, camera, color=color, name="Wrong camera!!!")
 
     return fig
-
-
-if __name__ == "__main__":
-
-    pass
